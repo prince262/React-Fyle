@@ -8,7 +8,7 @@ const para = ['adress', 'bank_id', 'branch', 'city', 'district', 'ifsc', 'state'
 function App() {
 
   useEffect(() => {
-    
+
     get()
 
 
@@ -47,12 +47,19 @@ function App() {
     setData(newData)
   }
   const [branch, setBranch] = useState('Select Branch')
-  const [page,setPage]=useState(1)
-const [totalpage,setTotalpage]=useState(0)
+  const [page, setPage] = useState(1)
+  const [totalpage, setTotalpage] = useState(0)
   const [data, setData] = useState([])
   const [maindata, setMainData] = useState([])
   const post1 = async (text) => {
     setBranch(text)
+    if(text=='Select Branch')
+    {
+      get()
+    }
+    else{
+
+    
     const axios = require('axios');
 
     let config = {
@@ -63,20 +70,21 @@ const [totalpage,setTotalpage]=useState(0)
 
     axios(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data.banks[0]));
+        console.log(JSON.stringify(response.data.banks));
         setData(response.data.banks)
         setMainData(response.data.banks)
         setTotalpage(response.data.page_count)
-        console.log(data)
+
       })
       .catch((error) => {
         console.log(error);
       });
+    }
 
 
   }
   const get = async () => {
-    console.log('start', branch)
+    console.log('start', totalpage)
     const axios = require('axios');
 
     let config = {
@@ -87,11 +95,11 @@ const [totalpage,setTotalpage]=useState(0)
 
     axios(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data.banks[0]));
+        console.log(JSON.stringify(response.data.banks));
         setData(response.data.banks)
         setMainData(response.data.banks)
         setTotalpage(response.data.page_count)
-        console.log(data)
+        // console.log(data)
       })
       .catch((error) => {
         console.log(error);
@@ -126,26 +134,53 @@ const [totalpage,setTotalpage]=useState(0)
   const handleChange = (event, value) => {
     console.log(value)
     setPage(value);
-    console.log('start', branch)
-    const axios = require('axios');
 
-    let config = {
-      method: 'get',
-      url: `https://princefylepython.herokuapp.com/api/branches/autocomplete?q=${branch}&offset=${value}`,
-      headers: {}
-    };
+    if (branch === 'Select Branch') {
+      console.log('branch', branch)
+      const axios = require('axios');
 
-    axios(config)
-      .then((response) => {
-         console.log(JSON.stringify(response.data.banks[0]));
-        setData(response.data.banks)
-        setMainData(response.data.banks)
-        setTotalpage(response.data.page_count)
-        console.log(data)
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      let config = {
+        method: 'get',
+        url: `https://princefylepython.herokuapp.com/api/branches/autocomplete?offset=${value}`,
+        headers: {}
+      };
+
+      axios(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data.banks));
+          setData(response.data.banks)
+          setMainData(response.data.banks)
+          setTotalpage(response.data.page_count)
+          // console.log(data)
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+    }
+    else {
+
+
+      const axios = require('axios');
+
+      let config = {
+        method: 'get',
+        url: `https://princefylepython.herokuapp.com/api/branches/autocomplete?q=${branch}&offset=${value}`,
+        headers: {}
+      };
+
+      axios(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data.banks[0]));
+          setData(response.data.banks)
+          setMainData(response.data.banks)
+          setTotalpage(response.data.page_count)
+          console.log(data)
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
 
   };
 
@@ -156,40 +191,22 @@ const [totalpage,setTotalpage]=useState(0)
       <h2>
         Bank Branches
     </h2>
-      <Row style={{ margin: '2%' }}>
+      <Row style={{ margin: '2%', justifyContent: 'space-between' }}>
 
 
-        <Col>
-          <input
-            style={{ marginLeft: '2%', alignSelf: 'center', justifyContent: 'center' }}
-            type="text"
-            id="1"
-            placeholder={'search'}
-            onChange={search}
-          />
-          {branch === 'Select Branch' ?
 
 
-            <Alert style={{ marginTop: '2%' }} variant={'warning'}>
-              Please Select Your Branch First
- </Alert> : ''
-          }
-
-        </Col>
-        <Col>
-
-        </Col>
         <Col>
 
 
 
 
-          <Dropdown style={{ alignSelf: 'center', marginLeft: "80%", }}>
+          <Dropdown style={{}}>
             <Dropdown.Toggle variant="success" id="dropdown-basic" >
               {branch}
             </Dropdown.Toggle>
 
-            <Dropdown.Menu id='item' style={{ flexDirection: 'column', padding: 10 }}>
+            <Dropdown.Menu id='item' style={{ flexDirection: 'column', }}>
               {/* {maindata.map((item1, index) => (
 
 
@@ -200,7 +217,7 @@ const [totalpage,setTotalpage]=useState(0)
                 // < Dropdown.Item key = { index } href="#/MUMBAI">{item1.branch}</Dropdown.Item>
 
               )) */}
-
+              <Dropdown.Item onClick={() => { post1('Select Branch') }} href="#/Select Branch">Select Branch</Dropdown.Item>
               <Dropdown.Item onClick={() => { post1('ABHYUDAYA NAGAR') }} href="#/ABHYUDAYA NAGAR">ABHYUDAYA NAGAR</Dropdown.Item>
               <Dropdown.Item onClick={() => { post1('BAIL BAZAR') }} href="#/BAIL BAZAR">BAIL BAZAR</Dropdown.Item>
               <Dropdown.Item onClick={() => { post1('BANDRA') }} href="#/BANDRA">BANDRA</Dropdown.Item>
@@ -215,54 +232,72 @@ const [totalpage,setTotalpage]=useState(0)
             </Dropdown.Menu>
           </Dropdown>
         </Col>
+        <Col style={{}}>
+          <input
+            style={{ alignSelf: 'center', }}
+            type="text"
+            id="1"
+            placeholder={'search'}
+            onChange={search}
+          />
+          {/* {branch === 'Select Branch' ?
+
+
+            <Alert style={{ marginTop: '2%' }} variant={'warning'}>
+              Please Select Your Branch First
+ </Alert> : ''
+          } */}
+
+        </Col>
 
 
       </Row>
 
-      {
-        branch !== 'Select Branch' ?
-          <Table responsive striped bordered hover size="sm">
-            <thead>
-              <tr>
-                <th>No</th>
-                {
-                  para.map((_, index) => (
+      {/* {
+        branch !== 'Select Branch' ? */}
+      <Table responsive striped bordered hover size="sm">
+        <thead>
+          <tr>
+            <th>No</th>
+            {
+              para.map((_, index) => (
 
-                    <th key={index}>{_}</th>
-                  ))
-                }
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((i, ind) => (
-
-
-                <tr>
-
-                  <td>{ind + 1}</td>
-                  <td>{i.address}</td>
-
-                  <td>{i.bank_id}</td>
-                  <td>{i.branch}</td>
-                  <td>{i.city}</td>
-                  <td>{i.district}</td>
-                  <td>{i.ifsc}</td>
-                  <td>{i.state}</td>
+                <th key={index}>{_}</th>
+              ))
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((i, ind) => (
 
 
+            <tr>
 
-                  {/* <td>
+              <td>{ind + 1}</td>
+              <td>{i.address}</td>
+
+              <td>{i.bank_id}</td>
+              <td>{i.branch}</td>
+              <td>{i.city}</td>
+              <td>{i.district}</td>
+              <td>{i.ifsc}</td>
+              <td>{i.state}</td>
+
+
+
+              {/* <td>
                 {i.isfc}
               </td> */}
-                </tr>
-              ))
-              }
+            </tr>
+          ))
+          }
 
-            </tbody>
-          </Table> : null
-      }
+        </tbody>
+      </Table>
+      {/* : null
+      } */}
 
-<Pagination id='page' page={page} count={totalpage} onChange={handleChange}  />
+      <Pagination id='page' page={page} count={totalpage} onChange={handleChange} />
     </Container >
   );
 }
